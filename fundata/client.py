@@ -12,7 +12,7 @@ secret_key="b6412b7cdd25eabc83e2cdb927f56506"
 def get_api_client():
     """获取 api client 对象
     """
-    print('get', api_client)
+    #print('get', api_client)
     if api_client is None:
         raise FundataApiException('API client is not initialized')
 
@@ -29,4 +29,4 @@ def init_api_client(public_key="1cae5ca0cbf4009f5298160292992f6d", secret_key="b
 
     global api_client
     api_client = ApiClient(public_key, secret_key)
-    print('init', api_client)
+    #print('init', api_client)

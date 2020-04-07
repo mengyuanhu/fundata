@@ -95,7 +95,7 @@ class InternalRequest(object):
 
         url = '{0}{1}'.format(self._base_url, query)
 
-        _logger.debug('Get %s with api-nonce %s', url, headers.get('Accept-ApiNonce'))
+        #_logger.debug('Get %s with api-nonce %s', url, headers.get('Accept-ApiNonce'))
 
         try:
             response = requests.get(url, headers=headers)
@@ -157,7 +157,7 @@ class ApiClient(object):
             'Accept-ApiSign': sign,
         }
 
-        _logger.info("Request uri: %s, params: %s, headers: %s", _uri_path, params, headers)
+        #_logger.info("Request uri: %s, params: %s, headers: %s", _uri_path, params, headers)
 
         if method == 'POST':
             return self._request.post(_uri_path, params, headers)

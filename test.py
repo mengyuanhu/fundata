@@ -10,6 +10,7 @@ from fundata.client import init_api_client
 from fundata.dota2.match import get_batch_basic_info
 from fundata.dota2.match import get_single_basic_info
 from fundata.dota2.player.player_info import get_batch_player
+from fundata.dota2.player.player_detail import get_player_detail_stats,get_player_data_status
 #unit test mysql
 from mysql.sqlConnect import sqlConnection,sqlDisconnection,sqlSelect, sqlInsert
 from mysql.dataHandler import api_transfer_sql
@@ -20,17 +21,17 @@ from mysql.dataHandler import api_transfer_sql
 #print(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 
-def test(public_key, secret_key):
-    # 用 public key，secret key 来初始化 client
-    client = ApiClient(public_key, secret_key)
+def test():
+    cur=sqlConnection()
+    res=sqlSelect("SELECT id FROM player WHERE name<>%s limit 1","x")
+    init_api_client()
+    for everyOne in res:
+        status = get_player_data_status(everyOne[0])
+        if status==2: 
+            print("find one=%i"%everyOne[0])
+            get_player_detail_stats(everyOne[0])
 
-    # 准备 API 需要的参数
-    uri = '/fundata-dota2-free/v2/match/basic-info'
-    data = {"match_id": 3765833999}
-
-    res = client.api(uri, data)
-
-    pprint(res)
+    sqlDisconnection()
 
 
 # 测试获取批量比赛基本数据
@@ -50,10 +51,9 @@ def sql():
     #将数据插入mysql
     cur=sqlConnection()
    
-    #res=sqlSelect("select* from lobby_type where en_name=%s","Tutorial")
+    res=sqlSelect("SELECT id FROM player WHERE name<>%s","x")
     #res=sqlInsert("insert into lobby_type( en_name, cn_name) values (%s,%s)", [('test22','2'),('test23','3')])
     #res=sqlInsert("insert into lobby_type( en_name, cn_name) values (%s,%s)", [('test22','2')])
-    print(row)
     sqlDisconnection()
 
 
@@ -98,7 +98,16 @@ def sync_match(s_time,volume):
 
 if __name__ == "__main__":
 
-   sync_match("2020-1-1 00:00:00",9)
+   #sync_match("2020-1-1 00:00:00",9)
+   test()
+   """
+   init_api_client()
+   res=get_player_detail_stats(101695162)
+   print(res)
+   """
+
+
+
 
 
 
