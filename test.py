@@ -1,60 +1,15 @@
 # -*- coding: utf-8 -*-
-import os
-import sys
 import time
-from pprint import pprint
-from fundata.request import ApiClient
 from fundata.client import init_api_client
 
-#unit test api
+#api
 from fundata.dota2.match import get_batch_basic_info
 from fundata.dota2.match import get_single_basic_info
 from fundata.dota2.player.player_info import get_batch_player
 from fundata.dota2.player.player_detail import get_player_detail_stats,get_player_data_status
-#unit test mysql
-from mysql.sqlConnect import sqlConnection,sqlDisconnection,sqlSelect, sqlInsert, columnName
-from mysql.dataHandler import api_transfer_sql
-#unit test gui
-from gui.webPage import generate_web_page
-
-
-
-#print(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
-sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
-
-def testSql():
-    cur=sqlConnection()
-    res=columnName("player")
-    print(res)
-    sqlDisconnection()
-
-
-# 测试获取批量比赛基本数据
-def test_single_basic_info():
-    # FIXME，需要设置 public_key/secret_key
-    init_api_client()
-
-    res = get_single_basic_info(3766730668)
-    pprint(res)
-
-    """DONE***
-    res=get_batch_player(0,3000)
-    row=sqlInsert("insert into player(id, real_name, name, nation, position) values (%s, %s, %s, %s, %s)",param)
-    """
-
-def testGui():
-    """
-   init_api_client()
-   res=get_batch_player()
-   generate_web_page("test.html","运动员数据","api", res)
-   print(res)
-   """
-    cur=sqlConnection()
-    data=sqlSelect("SELECT * FROM player WHERE name<>%s limit 10","x")
-    column=columnName("player")
-    res={"data":data,"column":column}
-    generate_web_page("test.html","运动员数据","sql", res)
-
+#mysql
+from mysql.sqlConnect import sqlConnection,sqlDisconnection,sqlInsert
+from mysql.dataHandler import api_transfer_sql, sqlColumn
 
 def sync_match(s_time,volume):
     """从api多次读取match信息，并且插入mysql数据库
@@ -65,40 +20,43 @@ def sync_match(s_time,volume):
     #转化时间为时间戳，设置初始值
     start_time=int(time.mktime(time.strptime(s_time, "%Y-%m-%d %H:%M:%S")))
     start_from=0
-    limit=200
+    limit=200 #API接口请求的最大限额
     
-    #初始化api和mysql，新建参数变量
+    #初始化api和mysql，
     init_api_client()
-    param=[]
     cur=sqlConnection()
-    sql="insert "
 
+
+    #新建插入Sql语句变量
+    param=[]
+    sql=[]
     while volume//limit>0: #当获取数据条数总数，大于api上限时，分批请求
         res=get_batch_basic_info(start_time,start_from,limit)
         param=param+api_transfer_sql(res) #将api的返回值转化为mysql需要的参数，并且拼接起来
-        #print("start=%s, volume=%s, param len=%i"%(start_from,volume,len(param)))
+        print("start=%s, volume=%s, param len=%i"%(start_from,volume,len(param)))
         volume=volume-limit
         start_from=res["data"][len(res["data"])-1]["match_id"] #获取最后一个match_id作为下一次api请求的参数，接着请求
     else:
-        if volume==0: return len(param) #总数是上限的倍数，分批请求完成
+        if volume!=0: #总数不是上限的倍数，剩余总数<上限，最后一次请求
+            res=get_batch_basic_info(start_time,start_from,volume)#****当超过limit之后，Fundata的API回复了一条数据****
+            param=param+api_transfer_sql(res) #分批请求完成
+            print("start=%s, volume=%s, param len=%i"%(start_from,volume,len(param)))
+        
+    #再请求一条数据，组成sql语句
+    res_a=get_batch_basic_info(start_time,start_from,1)
+    sql="insert into match_basic("+sqlColumn(res_a)["key"]+") values ("+sqlColumn(res_a)["s"]+")"
 
-        #print("Last Time=%i"%volume)
-        #res=[]
-        res=get_batch_basic_info(start_time,start_from,volume)#剩余总数<上限，最后一次请求
-        #****当超过limit之后，上层多回复了一条数据????****
-        #print(res)
-        param=param+api_transfer_sql(res) #分批请求完成
-       # print("start=%s, volume=%s, param len=%i"%(start_from,volume,len(param)))
-    
-    return len(param)
-    #print(param)
+    #执行插入
+    row=sqlInsert(sql,param)
+    #关闭数据库
+    sqlDisconnection()
+    return 0
         
 
 
 if __name__ == "__main__":
 
-   #sync_match("2020-1-1 00:00:00",9)
-   testGui()
+   sync_match("2020-1-1 00:00:00",210)
   
 
    
