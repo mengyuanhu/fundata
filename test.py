@@ -12,7 +12,7 @@ from fundata.dota2.match import get_single_basic_info
 from fundata.dota2.player.player_info import get_batch_player
 from fundata.dota2.player.player_detail import get_player_detail_stats,get_player_data_status
 #unit test mysql
-from mysql.sqlConnect import sqlConnection,sqlDisconnection,sqlSelect, sqlInsert
+from mysql.sqlConnect import sqlConnection,sqlDisconnection,sqlSelect, sqlInsert, columnName
 from mysql.dataHandler import api_transfer_sql
 #unit test gui
 from gui.webPage import generate_web_page
@@ -22,16 +22,10 @@ from gui.webPage import generate_web_page
 #print(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 
-def test():
+def testSql():
     cur=sqlConnection()
-    res=sqlSelect("SELECT id FROM player WHERE name<>%s limit 1","x")
-    init_api_client()
-    for everyOne in res:
-        status = get_player_data_status(everyOne[0])
-        if status==2: 
-            print("find one=%i"%everyOne[0])
-            get_player_detail_stats(everyOne[0])
-
+    res=columnName("player")
+    print(res)
     sqlDisconnection()
 
 
@@ -48,14 +42,18 @@ def test_single_basic_info():
     row=sqlInsert("insert into player(id, real_name, name, nation, position) values (%s, %s, %s, %s, %s)",param)
     """
 
-def sql():
-    #将数据插入mysql
+def testGui():
+    """
+   init_api_client()
+   res=get_batch_player()
+   generate_web_page("test.html","运动员数据","api", res)
+   print(res)
+   """
     cur=sqlConnection()
-   
-    res=sqlSelect("SELECT id FROM player WHERE name<>%s","x")
-    #res=sqlInsert("insert into lobby_type( en_name, cn_name) values (%s,%s)", [('test22','2'),('test23','3')])
-    #res=sqlInsert("insert into lobby_type( en_name, cn_name) values (%s,%s)", [('test22','2')])
-    sqlDisconnection()
+    data=sqlSelect("SELECT * FROM player WHERE name<>%s limit 10","x")
+    column=columnName("player")
+    res={"data":data,"column":column}
+    generate_web_page("test.html","运动员数据","sql", res)
 
 
 def sync_match(s_time,volume):
@@ -100,12 +98,9 @@ def sync_match(s_time,volume):
 if __name__ == "__main__":
 
    #sync_match("2020-1-1 00:00:00",9)
-   #test()
+   testGui()
   
-   init_api_client()
-   res=get_batch_player()
-   generate_web_page("test.html",res,"api")
-   print(res)
+
    
 
 

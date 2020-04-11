@@ -23,20 +23,32 @@ def api_generate_table(res_list):
     str+='</table>'
     return str
 
-def sql_generate_table(res_list):
+def sql_generate_table(data,column):
     """将MySql返回值的data部分，取出列名和列值
     参数：
     返回：HTML Table
     """
-    str='<table border="1">'       
+    str='<table border="1">' 
+    #生成列名
+    str+='<tr>'
+    for value in column:
+        str+='<th>%s</th>'%(value[0])
+    str+='</tr>'
+    
+    #生成列值
+    for val_i in data:
+        str+='<tr>'
+        for val_j in val_i:
+            str+='<td>%s</td>'% (val_j)
+        str+='</tr>'
+
     str+='</table>'
     return str
 
-def generate_web_page(page_name, res, type):
+def generate_web_page(page_name, title, type, res):
     """将API或者MySql取出的数据生成HMTL页面，并且打开web页面
-    参数：page_name网页名称, str，例如test.html
-    res数据，即从api或者mysql直接返回的结果
-    type类型，只有api和sql两种选择
+    参数：page_name网页名称(例如test.html)；title标题名称；type类型，只有api和sql两种选择
+    res数据：①api直接返回的结果；②sql是查询结果和列名组合，dict={"data":tuple, "column":tuple}
     """
 
     #命名生成的html
@@ -47,15 +59,15 @@ def generate_web_page(page_name, res, type):
     #页面开头
     str="""
     <html>
-    <head>英雄信息</head>
+    <head>%s</head>
     <body>
-    """
+    """%(title)
 
     #根据type，打印表格
     if type=='api':
         str+=api_generate_table(res["data"])
     elif type=='sql':
-        str+=sql_generate_table(res["data"])
+        str+=sql_generate_table(res["data"], res["column"])
     else:
         str+="<p>wrong type! cannot print any data</p>"
 

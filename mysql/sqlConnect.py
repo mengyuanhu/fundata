@@ -3,9 +3,9 @@ import pymysql
 
 
 ##新建mysql连接
-def sqlConnection():
+def sqlConnection(database="dota"):
     """新建全局的sql连接和游标
-    参数：无， 返回：无
+    参数：（选填）database默认是dota， 返回：无
     连接使用的用户python，密码python，数据库dota
     """
     global sqlCon
@@ -14,7 +14,7 @@ def sqlConnection():
         port=3306,
         user='python',
         password='python',
-        db='dota',
+        db=database,
         charset='utf8'
         )
     global cursor
@@ -38,7 +38,7 @@ def sqlSelect(query,param):
 	返回：游标查询到的数据，tuple格式
 	"""
 
-	if len(query)+len(param)>0: #判断是否有查询参数
+	if len(query)>0 and len(param)>0: #判断是否有查询参数
 		try: #尝试启动查询
 			row=cursor.execute(query,param)
 			if row>0: #查询正确
@@ -83,3 +83,11 @@ def sqlInsert(query,param):
 		print('invalid query')
 		return 0
 	return 0
+
+
+##表的列名
+def columnName(table):
+	"""根据表名，在information_schema.columns中查询列名
+	参数table是表名，返回值是tuple列名，例如(('id',), ('real_name',), ('name',), ('nation',), ('position',))
+	"""
+	return sqlSelect("SELECT COLUMN_NAME FROM information_schema.columns WHERE table_schema=%s AND table_name=%s",["dota",table])
