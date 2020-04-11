@@ -84,10 +84,48 @@ def sqlInsert(query,param):
 		return 0
 	return 0
 
-
 ##表的列名
 def columnName(table):
 	"""根据表名，在information_schema.columns中查询列名
 	参数table是表名，返回值是tuple列名，例如(('id',), ('real_name',), ('name',), ('nation',), ('position',))
 	"""
 	return sqlSelect("SELECT COLUMN_NAME FROM information_schema.columns WHERE table_schema=%s AND table_name=%s",["dota",table])
+
+##新建表
+def createTable(table_name,res,overRide=False):
+	"""新建数据库的表（如果表存在，就不会新建）
+	参数：table_name表名 ,res接口返回值,overRide如果有同名表，是否强制覆盖原表（选填，默认False）
+	返回操作结果：1成功，0失败
+	"""
+	#查看数据库中是否有同名表，查询返回值是
+	table_check=sqlSelect("SELECT count(*) FROM information_schema.TABLES WHERE table_name=%s",table_name)
+	if table_check[0][0]!=0 and overRide==False: #数据库有表格，但是不要求覆盖原表
+		print("已有同名的表，不再新建")
+		return 0
+	elif table_check[0][0]!=0 and overRide==True: #数据库有表格，要求覆盖原表
+		query="DROP TABLE IF EXISTS %s; "%(table_name)#删除原表，然后继续新建表
+		print("已有同名的表，将会删除原表")
+		try: #尝试启动删除
+			cursor.execute(query)
+		except Exception as e: #异常
+			print("fail: cannot create table")
+			return 0
+
+	#生成sql建表语句
+	if len(table_name)>0 and len(res)>0: #判断是否有查询参数
+		query="CREATE TABLE %s  ("%(table_name)
+		str_key=""
+		for key, value in res["data"][0].items():#遍历第[0]号数据的每一个键
+			str_key+="%s varchar(20),"%(key)
+		str_key=str_key[:-1]
+		query+=str_key+") ENGINE = InnoDB CHARACTER SET = utf8"
+
+		try: #尝试启动新建
+			cursor.execute(query)
+			return 1
+		except Exception as e: #异常
+			print("fail: cannot create table")
+			return 0
+		else:
+			return 0
+
