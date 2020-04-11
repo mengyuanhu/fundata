@@ -14,7 +14,8 @@ from fundata.dota2.player.player_detail import get_player_detail_stats,get_playe
 #unit test mysql
 from mysql.sqlConnect import sqlConnection,sqlDisconnection,sqlSelect, sqlInsert
 from mysql.dataHandler import api_transfer_sql
-
+#unit test gui
+from gui.webPage import generate_web_page
 
 
 
@@ -99,12 +100,13 @@ def sync_match(s_time,volume):
 if __name__ == "__main__":
 
    #sync_match("2020-1-1 00:00:00",9)
-   test()
-   """
+   #test()
+  
    init_api_client()
-   res=get_player_detail_stats(101695162)
+   res=get_batch_player()
+   generate_web_page("test.html",res,"api")
    print(res)
-   """
+   
 
 
 

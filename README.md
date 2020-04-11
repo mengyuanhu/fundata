@@ -49,7 +49,6 @@ api.varena.com Python SDK
 
 
 ##开发环境搭建
-"""
 1. 安装VS 2019 Community
 2. 安装Python（勾选pip选项）
 	2.1. 配置环境变量，新增Python 安装路径
@@ -69,5 +68,3 @@ api.varena.com Python SDK
 8. 添加新用户python密码python，用来给python连接数据库
 9. 在Github注册账户mengyuanhumy@163.com,密码tyyHU1026，新建仓库fundata
 10. 在VS安装扩展github，登录Github的用户，并且同步代码。
-
-"""
