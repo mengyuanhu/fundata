@@ -2,11 +2,11 @@
   "ExpandedNodes": [
     "",
     "\\fundata",
-    "\\fundata\\dota2\\match\\single",
+    "\\fundata\\dota2",
+    "\\fundata\\dota2\\team",
     "\\gui",
     "\\mysql",
     "\\sync"
   ],
-  "SelectedNode": "\\README.md",
   "PreviewInSolutionExplorer": false
 }
