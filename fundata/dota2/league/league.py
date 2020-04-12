@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 from ...client import get_api_client
+#赛事列表
 
 def get_league_list(page_size,page):
 	"""批量获取赛事列表
-	参数page_size,page
+	参数page=[int] page_size=[int]
 	返回dict格式
 	"""
 	client=get_api_client()

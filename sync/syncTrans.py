@@ -6,7 +6,7 @@ sys.path.append(current_dir) # add work dir to sys pat
 
 import time
 from fundata.client import init_api_client
-from fundata.dota2.match import get_batch_basic_info
+from fundata.dota2.match.match import *
 from mysql.sqlConnect import sqlConnection,sqlDisconnection,sqlInsert
 from mysql.dataHandler import api_transfer_sql, sqlColumn
 
