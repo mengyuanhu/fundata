@@ -66,5 +66,5 @@ api.varena.com Python SDK
     #6. 设置固定IP
     #7. 添加新用户manu密码dota2，修改成可远程访问的用户（修改mysql-user表中Host为%）
     #8. 添加新用户python密码python，用来给python连接数据库
-    #9. 在Github注册账户mengyuanhumy@163.com,密码tyyHU1026，新建仓库fundata
-    #10. 在VS安装扩展github，登录Github的用户，并且同步代码。
+    #9. 在Github注册账户mengyuanhumy,密码mengyuanhumy，新建仓库fundata
+    #10. 在VS安装扩展github，配置同步位置是https://mengyuanhumy:mengyuanhumy@github.com/mengyuanhumy/fundata.git。

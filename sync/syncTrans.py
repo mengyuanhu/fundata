@@ -6,14 +6,19 @@ sys.path.append(current_dir) # add work dir to sys pat
 
 import time
 from fundata.client import init_api_client
+from fundata.dota2.league.league import *
+from fundata.dota2.league.player import *
+from fundata.dota2.league.team import *
 from fundata.dota2.match.match import *
-from mysql.sqlConnect import sqlConnection,sqlDisconnection,sqlInsert
-from mysql.dataHandler import api_transfer_sql, sqlColumn
+from fundata.dota2.raw.raw import *
+
+from mysql.sqlConnect import *
+from mysql.dataHandler import *
 
 def sync_match(s_time,volume):
     """从api多次读取match信息，并且插入mysql数据库
     参数：s_time是str，例如"2020-1-1 00:00:00"；limit是int，需要数据条数
-    返回：影响行数，未写完
+    返回：影响行数
     """
     if volume<=0: return 0
     #转化时间为时间戳，设置初始值
@@ -23,7 +28,7 @@ def sync_match(s_time,volume):
     
     #初始化api和mysql，
     init_api_client()
-    cur=sqlConnection()
+    sqlConnection()
 
 
     #新建插入Sql语句变量
@@ -50,3 +55,87 @@ def sync_match(s_time,volume):
     #关闭数据库
     sqlDisconnection()
     return row
+
+def sync_team(volume):
+    """将API获取到的战队基本信息，不强制新建表并且储存到数据库中
+    参数：volume=[int] 队员数量
+    返回：数据库影响行数
+    """
+    if volume<=0: return 0 #参数无效，返回
+
+    ##从API拿数据
+    init_api_client()
+    res=get_batch_team(0,volume)
+    if fetch_data(res)==0: return 0 #未获取到API数据，返回
+    
+    ##写入MySQL
+    sqlConnection()
+    if createTable("team",res)==0: return 0 #建表失败，返回
+    
+    #将API返回结果，转化成参数
+    param=api_transfer_sql(res)
+    #插入数据
+    str=sqlColumn(res)
+    sql="insert into team("+str["key"]+") values ("+str["s"]+")"
+    row=sqlInsert(sql,param)
+    
+    #关闭数据库
+    sqlDisconnection()
+    return row
+
+def sync_player(volume):
+    """将API获取到的队员基本信息，强制新建表并且储存到数据库中
+    参数：volume=[int] 队员数量
+    返回：数据库影响行数
+    """
+    if volume<=0: return 0 #参数无效，返回
+
+    ##从API拿数据
+    init_api_client()
+    res=get_batch_player(0,volume)
+    if fetch_data(res)==0: return 0 #未获取到API数据，返回
+    
+    ##写入MySQL
+    sqlConnection()
+    if createTable("player",res,True)==0: return 0 #建表失败，返回
+    
+    #将API返回结果，转化成参数
+    param=api_transfer_sql(res)
+    #插入数据
+    str=sqlColumn(res)
+    sql="insert into player("+str["key"]+") values ("+str["s"]+")"
+    row=sqlInsert(sql,param)
+    
+    #关闭数据库
+    sqlDisconnection()
+    return row
+
+def sync_item():
+    """将API获取到的道具基本信息，强制新建表并且储存到数据库中
+    参数：无
+    返回：数据库影响行数
+    """
+
+    ##从API拿数据
+    init_api_client()
+    res=get_item()
+    if fetch_data(res)==0: return 0 #未获取到API数据，返回
+    
+    ##写入MySQL
+    sqlConnection()
+    if createTable("item",res,True)==0: return 0 #建表失败，返回
+    
+    #将API返回结果，转化成参数
+    param=api_transfer_sql(res)
+    #插入数据
+    str=sqlColumn(res)
+    sql="insert into item("+str["key"]+") values ("+str["s"]+")"
+    row=sqlInsert(sql,param)
+    
+    #关闭数据库
+    sqlDisconnection()
+    return row
+
+def sync_hero():
+   
+    return 0

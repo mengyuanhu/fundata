@@ -101,7 +101,7 @@ def createTable(table_name,res,overRide=False):
 	table_check=sqlSelect("SELECT count(*) FROM information_schema.TABLES WHERE table_name=%s",table_name)
 	if table_check[0][0]!=0 and overRide==False: #数据库有表格，但是不要求覆盖原表
 		print("已有同名的表，不再新建")
-		return 0
+		return 1
 	elif table_check[0][0]!=0 and overRide==True: #数据库有表格，要求覆盖原表
 		query="DROP TABLE IF EXISTS %s; "%(table_name)#删除原表，然后继续新建表
 		print("已有同名的表，将会删除原表")
@@ -116,7 +116,7 @@ def createTable(table_name,res,overRide=False):
 		query="CREATE TABLE %s  ("%(table_name)
 		str_key=""
 		for key, value in res["data"][0].items():#遍历第[0]号数据的每一个键
-			str_key+="%s varchar(20),"%(key)
+			str_key+="%s varchar(200),"%(key)
 		str_key=str_key[:-1]
 		query+=str_key+") ENGINE = InnoDB CHARACTER SET = utf8"
 
