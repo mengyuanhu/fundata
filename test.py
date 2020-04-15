@@ -7,7 +7,7 @@ from mysql.dataHandler import api_transfer_sql,sqlColumn
 
 if __name__ == "__main__":
 
-   print("sync team=%i"%sync_team(8))
+   print(sync_match("2020-4-14 00:00:00",0,30105))
   
 
    

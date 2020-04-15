@@ -35,7 +35,8 @@ def sqlColumn(res):
         for key, value in res["data"][0].items():#遍历第[0]号数据的每一个键
             str_key+="%s,"%(key)
             str_s+="%s,"
-    return {"key":str_key[:-1],"s":str_s[:-1]}#返回时，去掉最后一个逗号
+        return {"key":str_key[:-1],"s":str_s[:-1]}#返回时，去掉最后一个逗号
+    else: return {"key":"","s":""}#没有数据，按照约定格式返回空
 
 
 def fetch_data(res):
