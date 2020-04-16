@@ -15,9 +15,9 @@ from fundata.dota2.raw.raw import *
 from mysql.sqlConnect import *
 from mysql.dataHandler import *
 
-def sync_match(s_time,s_from,volume):
+def sync_match_backup(s_time,s_from,volume):
     """从api多次读取match信息，并且插入mysql数据库。
-    -当轮询API请求中断时，将现有数据保存至mysql并且返回最有一次match
+    -当轮询API请求中断时，重试3次
     
     参数：s_time=[str]，例如"2020-1-1 00:00:00"；
     s_from=[int]，默认是0，如果是继续取值，则写match_id
@@ -41,6 +41,7 @@ def sync_match(s_time,s_from,volume):
     if s_from>0: start_from=s_from
     else:start_from=0
     limit=200 #API接口请求的最大限额
+    retry=3 #重试次数的上限
     
     #初始化api和mysql
     init_api_client()
